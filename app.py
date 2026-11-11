@@ -5,6 +5,7 @@ Production: PostgreSQL and HTTPS-only cookies are mandatory.
 import base64
 import hashlib
 import hmac
+import ipaddress
 import json
 import math
 import os
@@ -150,8 +151,16 @@ def csrf_required(f):
     return wrapped
 
 def attempt_keys(username):
-    # User and IP buckets are independent to limit broad guessing and targeted guessing.
-    return [digest('u:' + username.casefold()), digest('ip:' + (request.remote_addr or 'unknown'))]
+    # Railway's edge provides X-Real-IP. Trust it only when explicitly configured
+    # and only when the app is exclusively behind that trusted edge.
+    client_ip = request.remote_addr or 'unknown'
+    if os.environ.get('RAILWAY_TRUST_REAL_IP', '0') == '1':
+        try:
+            client_ip = str(ipaddress.ip_address(request.headers.get('X-Real-IP', '')))
+        except ValueError:
+            pass
+    # User and IP buckets are independent to limit broad and targeted guessing.
+    return [digest('u:' + username.casefold()), digest('ip:' + client_ip)]
 
 def is_blocked(keys):
     with engine.connect() as c:

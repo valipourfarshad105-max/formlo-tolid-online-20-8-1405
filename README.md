@@ -1,12 +1,5 @@
-# Afraz Cloud
+# Afraz Cloud — Railway
 
-Production: Flask + PostgreSQL, cookie sessions, CSRF protection and optimistic concurrency. Render Blueprint: `render.yaml`. See `راهنمای استقرار.md` before deployment.
+See `راهنمای استقرار در Railway.md` for the Persian deployment instructions. The Dockerfile runs the Flask application using Railway's `PORT` environment variable. Production requires a private PostgreSQL `DATABASE_URL`, `BOOTSTRAP_USER`, and `BOOTSTRAP_PASSWORD`. Never commit credentials to Git.
 
-Development (never expose publicly):
-
-```sh
-pip install -r requirements.txt
-APP_ENV=development BOOTSTRAP_USER=demo BOOTSTRAP_PASSWORD='your-long-dev-password' python app.py
-```
-
-Production requires `DATABASE_URL` for PostgreSQL, and bootstrap credentials for first startup. Keep the repository private and never commit secrets. Configure independent backups; JSON exports exclude user accounts. All application users have equal administrative access. This is not an audited accounting or security product.
+All app users have equal administrative privileges. The app is not a formally audited security or accounting product. The PostgreSQL service and backups are separate from the web service.
